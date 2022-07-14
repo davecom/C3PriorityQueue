@@ -1,4 +1,3 @@
-//
 //  priorityqueue.c3
 //  A priority queue using a classic binary heap for C3.
 //
@@ -26,14 +25,6 @@ import std::array::list;
 
 define Heap = List<Type>;
 
-// From C3 Documentation
-// http://www.c3-lang.org/macros/
-macro void @swap(&a, &b) {
-    $typeof(a) temp = a;
-    a = b;
-    b = temp;
-}
-
 struct PriorityQueue {
     Heap heap;
     bool max;  // true if max-heap, false if min-heap
@@ -44,8 +35,9 @@ fn void PriorityQueue.push(PriorityQueue *pq, Type element) {
     usize i = pq.heap.len() - 1;
     while (i > 0) {
         usize parent = (i - 1) / 2;
-        if ((pq.max && pq.heap[i] > pq.heap[parent]) || (!pq.max && pq.heap[i] < pq.heap[parent])) {
-            swap(pq.heap[i], pq.heap[parent]);
+        if ((pq.max && pq.heap.get(i) > pq.heap.get(parent)) || (!pq.max && pq.heap.get(i) < pq.heap.get(parent))) {
+            // @swap(pq.heap[i], pq.heap[parent]);
+            pq.heap.swap(i, parent);
             i = parent;
         } else {
             break;
@@ -59,14 +51,17 @@ fn void PriorityQueue.push(PriorityQueue *pq, Type element) {
 fn Type PriorityQueue.pop(PriorityQueue *pq) {
     usize i = 0;
     usize newCount = pq.heap.len() - 1;
-    swap(pq.heap[0], pq.heap[newCount]);
-    while ((2 * index + 1) < newCount){
+    pq.heap.swap(0, newCount);
+    while ((2 * i + 1) < newCount){
         usize j = 2 * i + 1;
-        if (j + 1 < newCount && (pq.max && pq.heap[j + 1] > pq.heap[j] || (!pq.max && pq.heap[j + 1] < pq.heap[j]))) {
+        if (((j + 1) < newCount) && 
+            ((pq.max && (pq.heap.get(j + 1) > pq.heap[j])) || 
+                (!pq.max && (pq.heap.get(j + 1) < pq.heap.get(j))))) {
             j++;
         }
-        if ((pq.max && pq.heap[i] > pq.heap[j]) || (!pq.max && pq.heap[i] < pq.heap[j])) {
-            swap(pq.heap[i], pq.heap[j]);
+        if ((pq.max && pq.heap.get(i) < pq.heap.get(j)) || (!pq.max && pq.heap.get(i) > pq.heap.get(j))) {
+            //@swap(pq.heap[i], pq.heap[j]);
+            pq.heap.swap(i, j);
             i = j;
         } else {
             break;
@@ -80,9 +75,13 @@ fn Type PriorityQueue.pop(PriorityQueue *pq) {
  * @require pq.heap.len() > 0
  */
 fn Type PriorityQueue.peek(PriorityQueue *pq) {
-    return pq.heap[0];
+    return pq.heap.get(0);
 }
 
-fn void PriorityQueue.free(PriorityQueue *pq){
+fn void PriorityQueue.free(PriorityQueue *pq) {
     pq.heap.free();
+}
+
+fn usize PriorityQueue.len(PriorityQueue *pq) @operator(len) {
+    return pq.heap.len();
 }

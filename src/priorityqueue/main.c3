@@ -1,4 +1,3 @@
-//
 //  main.c3
 //  A priority queue using a classic binary heap for C3.
 //
@@ -30,16 +29,62 @@ extern fn int printf(char* format, ...);
 define IntList = List<int>;
 define IntPriorityQueue = PriorityQueue<int>;
 
-fn void main() {
-    IntList l;
-    l.push(1);
-    l.push(5);
-    printf("pop %d\n", l.pop());
+fn void expect(int expected, int actual, int *failures) {
+    if (expected != actual) {
+        printf("Expected %d, got %d\n", expected, actual);
+        *failures++;
+    }
+}
 
-    
+fn void basicTest() {
+    int failures = 0;
     IntPriorityQueue pq;
-
     pq.push(1);
+    expect(1, pq.peek(), &failures);
+    expect(1, (int)pq.len(), &failures);
     pq.push(5);
-    printf("pop %d\n", pq.pop());
+    expect(1, pq.peek(), &failures);
+    expect(2, (int)pq.len(), &failures);
+    pq.push(3);
+    expect(1, pq.peek(), &failures);
+    expect(3, (int)pq.len(), &failures);
+    pq.push(6);
+    expect(1, pq.peek(), &failures);
+    expect(4,(int)pq.len(), &failures);
+    pq.push(4);
+    expect(1, pq.peek(), &failures);
+    expect(5, (int)pq.len(), &failures);
+    expect(1, pq.pop(), &failures);
+    expect(4, (int)pq.len(), &failures);
+    expect(3, pq.pop(), &failures);
+    expect(3, (int)pq.len(), &failures);
+    expect(4, pq.pop(), &failures);
+    expect(2, (int)pq.len(), &failures);
+    expect(5, pq.pop(), &failures);
+    expect(1, (int)pq.len(), &failures);
+    expect(6, pq.pop(), &failures);
+    expect(0, (int)pq.len(), &failures);
+    pq.free();
+    printf("Basic test ran with %d failures.\n", failures);
+}
+
+fn void basicTest2() {
+    int failures = 0;
+    IntPriorityQueue pq;
+    pq.max = true;
+    for (int i = 0; i < 100; i++) {
+        pq.push(i);
+        expect(i + 1, (int)pq.len(), &failures);
+    }
+    for (int i = 99; i >= 0; i--) {
+        expect(i, pq.pop(), &failures);
+        expect(i, (int)pq.len(), &failures);
+    }
+    pq.free();
+    printf("Basic test 2 ran with %d failures.\n", failures);
+}
+
+fn void main() {
+    basicTest();
+    basicTest2();
 }
