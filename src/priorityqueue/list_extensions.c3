@@ -24,16 +24,13 @@ module std::array::list<Type>;
 
 // From C3 Documentation
 // http://www.c3-lang.org/macros/
-// macro void @swap(&a, &b) {
-//     $typeof(a) temp = a;
-//     a = b;
-//     b = temp;
-// }
+macro void @swap(&a, &b) {
+    $typeof(a) temp = a;
+    a = b;
+    b = temp;
+}
 
 // Make it easier to swap variables
 fn void List.swap(List *list, usize i, usize j) {
-    //@swap(this[i], this[j]);
-    Type temp = list.get(i);
-    list.entries[i] = list.get(j);
-    list.entries[j] = temp;
+    @swap(list.entries[i], list.entries[j]);
 }

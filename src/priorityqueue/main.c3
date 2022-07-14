@@ -32,7 +32,7 @@ define IntPriorityQueue = PriorityQueue<int>;
 fn void expect(int expected, int actual, int *failures) {
     if (expected != actual) {
         printf("Expected %d, got %d\n", expected, actual);
-        *failures++;
+        *failures += 1;
     }
 }
 
