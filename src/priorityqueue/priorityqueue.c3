@@ -23,6 +23,26 @@
 module priorityqueue<Type>;
 import std::array::list;
 
+
+// Helper macros to allow arbitrary non-primitive types to be comparable
+macro bool less(Type x, Type y)
+{
+  $if ($defined(Type.less)):
+    return x.less(y);
+  $else:
+    return x < y;
+  $endif;
+}
+
+macro bool greater(Type x, Type y)
+{
+  $if ($defined(Type.less)):
+    return x.greater(y);
+  $else:
+    return x > y;
+  $endif;
+}
+
 define Heap = List<Type>;
 
 struct PriorityQueue {
@@ -35,7 +55,7 @@ fn void PriorityQueue.push(PriorityQueue *pq, Type element) {
     usize i = pq.heap.len() - 1;
     while (i > 0) {
         usize parent = (i - 1) / 2;
-        if ((pq.max && pq.heap.get(i) > pq.heap.get(parent)) || (!pq.max && pq.heap.get(i) < pq.heap.get(parent))) {
+        if ((pq.max && greater(pq.heap.get(i), pq.heap.get(parent))) || (!pq.max && less(pq.heap.get(i), pq.heap.get(parent)))) {
             // @swap(pq.heap[i], pq.heap[parent]);
             pq.heap.swap(i, parent);
             i = parent;
@@ -55,11 +75,11 @@ fn Type PriorityQueue.pop(PriorityQueue *pq) {
     while ((2 * i + 1) < newCount){
         usize j = 2 * i + 1;
         if (((j + 1) < newCount) && 
-            ((pq.max && (pq.heap.get(j + 1) > pq.heap[j])) || 
-                (!pq.max && (pq.heap.get(j + 1) < pq.heap.get(j))))) {
+            ((pq.max && greater(pq.heap.get(j + 1), pq.heap[j])) || 
+                (!pq.max && less(pq.heap.get(j + 1), pq.heap.get(j))))) {
             j++;
         }
-        if ((pq.max && pq.heap.get(i) < pq.heap.get(j)) || (!pq.max && pq.heap.get(i) > pq.heap.get(j))) {
+        if ((pq.max && less(pq.heap.get(i), pq.heap.get(j))) || (!pq.max && greater(pq.heap.get(i), pq.heap.get(j)))) {
             //@swap(pq.heap[i], pq.heap[j]);
             pq.heap.swap(i, j);
             i = j;

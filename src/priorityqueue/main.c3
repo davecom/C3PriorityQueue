@@ -29,9 +29,9 @@ extern fn int printf(char* format, ...);
 define IntList = List<int>;
 define IntPriorityQueue = PriorityQueue<int>;
 
-fn void expect(int expected, int actual, int *failures) {
+macro expect(expected, actual, int *failures) {
     if (expected != actual) {
-        printf("Expected %d, got %d\n", expected, actual);
+        printf("Expected %d, got %d on line %d\n", expected, actual, $$LINE);
         *failures += 1;
     }
 }
